@@ -1,8 +1,8 @@
 {
-	"name": "vite-react-template",
-	"description": "A template for building a React application with Vite, Hono, and Cloudflare Workers",
+	"name": "medmetrix-frontend",
+	"description": "MedMetrix frontend (Vite + React) deployable on Cloudflare Workers",
 	"cloudflare": {
-		"label": "Vite React Template",
+		"label": "MedMetrix Frontend",
 		"products": [
 			"Workers"
 		],
@@ -11,10 +11,22 @@
 		"preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/ec7f4be5-d1d6-4e94-0851-126341745400/preview",
 		"publish": true
 	},
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "tsc -b && vite build",
+		"cf-typegen": "wrangler types",
+		"check": "tsc && vite build && wrangler deploy --dry-run",
+		"deploy": "wrangler deploy",
+		"dev": "vite",
+		"lint": "eslint .",
+		"preview": "npm run build && vite preview"
+	},
 	"dependencies": {
 		"hono": "4.11.1",
 		"react": "19.2.1",
-		"react-dom": "19.2.1"
+		"react-dom": "19.2.1",
+		"react-router-dom": "^7.6.3"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "1.15.3",
@@ -31,16 +43,5 @@
 		"typescript-eslint": "8.48.0",
 		"vite": "^7.0.0",
 		"wrangler": "4.88.0"
-	},
-	"private": true,
-	"scripts": {
-		"build": "tsc -b && vite build",
-		"cf-typegen": "wrangler types",
-		"check": "tsc && vite build && wrangler deploy --dry-run",
-		"deploy": "wrangler deploy",
-		"dev": "vite",
-		"lint": "eslint .",
-		"preview": "npm run build && vite preview"
-	},
-	"type": "module"
+	}
 }
