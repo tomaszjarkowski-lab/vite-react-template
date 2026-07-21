@@ -11,6 +11,7 @@ export type AnalysisDetailPrediction = {
 	Description?: string;
 	ReadMoreUrl?: string;
 	ConfidenceWithAiModel?: number;
+	ConfidenceType?: number | string;
 };
 
 export type AnalysisResultJson = {

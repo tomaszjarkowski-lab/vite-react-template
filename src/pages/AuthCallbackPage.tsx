@@ -40,7 +40,7 @@ export function AuthCallbackPage() {
 
 		if (!accessToken) {
 			setStatus(
-				"Brak access_token w URL (hash/query). Sprawdź redirect URL w Supabase (http://localhost:3000/auth/callback) albo użyj flow z hashedToken.",
+				"Brak access_token w URL. Sprawdź redirect URL w Supabase (http://localhost:3000/auth/callback) albo wygeneruj nowy link logowania.",
 			);
 			return;
 		}

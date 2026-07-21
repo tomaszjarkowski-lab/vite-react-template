@@ -1,127 +1,197 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { ApiError, requestMagicLink, verifyMagicLink } from "../api/client";
-import { saveSession } from "../auth/session";
+import { ApiError, requestMagicLink } from "../api/client";
+import { MedMetrixLogo } from "../components/MedMetrixLogo";
 import type { MagicLinkResponse } from "../types/api";
 
-function showError(error: unknown): void {
+function getErrorMessage(error: unknown): string {
 	if (error instanceof ApiError) {
-		alert(error.message);
-		return;
+		if (error.status === 404) {
+			return "Nie znaleziono konta dla podanego adresu e-mail.";
+		}
+		return error.message;
 	}
-	if (error instanceof Error) {
-		alert(error.message);
-		return;
-	}
-	alert("Wystąpił nieoczekiwany błąd.");
+	if (error instanceof Error) return error.message;
+	return "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.";
+}
+
+function isValidEmail(value: string): boolean {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 export function LoginPage() {
-	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
-	const [verifying, setVerifying] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const [magicLink, setMagicLink] = useState<MagicLinkResponse | null>(null);
+
+	const trimmedEmail = email.trim();
+	const canSubmit = isValidEmail(trimmedEmail) && !loading;
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		const trimmed = email.trim();
-		if (!trimmed) {
-			alert("Podaj email.");
-			return;
-		}
+		if (!canSubmit) return;
 
 		setLoading(true);
+		setError(null);
 		setMagicLink(null);
+
 		try {
-			const result = await requestMagicLink({ email: trimmed });
+			const result = await requestMagicLink({ email: trimmedEmail });
 			setMagicLink(result);
-		} catch (error) {
-			showError(error);
+		} catch (err) {
+			setError(getErrorMessage(err));
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	async function handleVerifyHashedToken() {
-		if (!magicLink?.hashedToken) return;
-
-		setVerifying(true);
-		try {
-			const session = await verifyMagicLink({
-				hashedToken: magicLink.hashedToken,
-			});
-			saveSession({
-				accessToken: session.accessToken,
-				refreshToken: session.refreshToken,
-				email: session.email,
-				userId: session.userId,
-			});
-			navigate("/dashboard", { replace: true });
-		} catch (error) {
-			showError(error);
-		} finally {
-			setVerifying(false);
-		}
+	function handleReset() {
+		setMagicLink(null);
+		setError(null);
 	}
 
 	return (
-		<main className="page">
-			<h1>MedMetrix — Login</h1>
-			<p className="muted">Zaloguj się emailem (magic link / hashedToken).</p>
+		<main className="login-page">
+			<div className="login-page__backdrop" aria-hidden="true" />
 
-			<form className="stack" onSubmit={handleSubmit}>
-				<label htmlFor="email">Email</label>
-				<input
-					id="email"
-					type="email"
-					autoComplete="email"
-					placeholder="user@example.com"
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					required
-				/>
-				<button type="submit" disabled={loading}>
-					{loading ? "Wysyłanie…" : "Wyślij magic link"}
-				</button>
-			</form>
-
-			{magicLink && (
-				<section className="result stack">
-					<h2>Wynik magic link</h2>
-					<p>
-						<strong>Email:</strong> {magicLink.email}
-					</p>
-					{magicLink.emailOtp && (
-						<p>
-							<strong>emailOtp:</strong> {magicLink.emailOtp}
+			<div className="login-shell">
+				<section className="login-card" aria-labelledby="login-title">
+					<header className="login-card__header">
+						<MedMetrixLogo className="medmetrix-logo" size="lg" />
+						<p className="login-card__eyebrow">Portal pacjenta</p>
+						<h1 id="login-title" className="login-card__title">
+							Zaloguj się do MedMetrix
+						</h1>
+						<p className="login-card__subtitle">
+							Wyślemy bezpieczny link logowania na Twój adres
+							e-mail. Nie potrzebujesz hasła.
 						</p>
+					</header>
+
+					{!magicLink ? (
+						<form className="login-form" onSubmit={handleSubmit} noValidate>
+							<label className="login-field" htmlFor="email">
+								<span>Adres e-mail</span>
+								<input
+									id="email"
+									type="email"
+									autoComplete="email"
+									inputMode="email"
+									placeholder="jan.kowalski@email.com"
+									value={email}
+									onChange={(e) => {
+										setEmail(e.target.value);
+										if (error) setError(null);
+									}}
+									disabled={loading}
+									aria-invalid={Boolean(error)}
+									aria-describedby={
+										error ? "login-error" : "login-hint"
+									}
+								/>
+							</label>
+
+							<p id="login-hint" className="login-hint">
+								Użyj adresu powiązanego z zakupioną analizą.
+							</p>
+
+							{error && (
+								<div
+									id="login-error"
+									className="login-alert login-alert--error"
+									role="alert"
+								>
+									{error}
+								</div>
+							)}
+
+							<button
+								type="submit"
+								className="login-submit"
+								disabled={!canSubmit}
+							>
+								{loading ? (
+									<span className="login-submit__loading">
+										<span
+											className="login-spinner"
+											aria-hidden="true"
+										/>
+										Wysyłanie linku…
+									</span>
+								) : (
+									"Zaloguj się"
+								)}
+							</button>
+						</form>
+					) : (
+						<section className="email-sim" aria-live="polite">
+							<div className="email-sim__banner">
+								<span className="email-sim__badge">
+									Tryb deweloperski
+								</span>
+								<p>
+									Poniżej symulujemy wiadomość e-mail. W
+									produkcji link trafiłby na skrzynkę — teraz
+									kliknij go poniżej, aby się zalogować.
+								</p>
+							</div>
+
+							<article className="email-preview">
+								<header className="email-preview__meta">
+									<div className="email-preview__from">
+										<span className="email-preview__avatar">
+											M
+										</span>
+										<div>
+											<strong>MedMetrix</strong>
+											<p>noreply@medmetrix.app</p>
+										</div>
+									</div>
+									<p className="email-preview__to">
+										Do: <strong>{magicLink.email}</strong>
+									</p>
+									<p className="email-preview__subject">
+										Twój link do logowania
+									</p>
+								</header>
+
+								<div className="email-preview__body">
+									<p>Witaj,</p>
+									<p>
+										Kliknij poniższy przycisk, aby bezpiecznie
+										zalogować się do portalu MedMetrix.
+									</p>
+									<a
+										className="email-preview__cta"
+										href={magicLink.actionLink}
+										rel="noreferrer"
+									>
+										Zaloguj się przez link
+									</a>
+									<p className="email-preview__note">
+										Link jest jednorazowy i może wygasnąć.
+										Jeśli go nie użyjesz, wygeneruj nowy.
+									</p>
+								</div>
+							</article>
+
+							<div className="email-sim__actions">
+								<button
+									type="button"
+									className="login-secondary"
+									onClick={handleReset}
+								>
+									Użyj innego e-maila
+								</button>
+							</div>
+						</section>
 					)}
-					<div className="row">
-						<a
-							className="button"
-							href={magicLink.actionLink}
-							target="_blank"
-							rel="noreferrer"
-						>
-							Otwórz link
-						</a>
-						<button
-							type="button"
-							onClick={handleVerifyHashedToken}
-							disabled={verifying}
-						>
-							{verifying
-								? "Weryfikacja…"
-								: "Zaloguj przez hashedToken"}
-						</button>
-					</div>
-					<details>
-						<summary>hashedToken (debug)</summary>
-						<code className="break">{magicLink.hashedToken}</code>
-					</details>
 				</section>
-			)}
+
+				<p className="login-footer">
+					Bezpieczne logowanie bez hasła · MedMetrix
+				</p>
+			</div>
 		</main>
 	);
 }
