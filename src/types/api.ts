@@ -1,3 +1,31 @@
+export type AnalysisResponsePrediction = {
+	name?: string;
+	diseaseName?: string;
+	confidence?: number;
+};
+
+export type AnalysisDetailPrediction = {
+	Name?: string;
+	ClassificationName?: string;
+	Icd?: string;
+	Description?: string;
+	ReadMoreUrl?: string;
+	ConfidenceWithAiModel?: number;
+};
+
+export type AnalysisResultJson = {
+	AlgorithmType?: string;
+	ResponseMessage?: {
+		success?: boolean;
+		message?: string;
+		predictions?: AnalysisResponsePrediction[];
+	};
+	Details?: {
+		PhotoUrl?: string;
+		Predictions?: AnalysisDetailPrediction[];
+	};
+};
+
 export type MagicLinkRequest = {
 	email: string;
 };
@@ -67,6 +95,7 @@ export type AnalysisResult = {
 	userId: string;
 	doctorOpinionId: string | null;
 	purchaseId: string | null;
+	analysisResultJson: AnalysisResultJson | null;
 	doctorOpinion: DoctorOpinion | null;
 	purchase: Purchase | null;
 };

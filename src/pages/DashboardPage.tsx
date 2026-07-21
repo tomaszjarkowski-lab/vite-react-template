@@ -12,6 +12,7 @@ import type {
 	DoctorOpinion,
 	Purchase,
 } from "../types/api";
+import { AnalysisDetailsSection } from "../components/AnalysisDetailsSection";
 
 function showError(error: unknown): void {
 	if (error instanceof ApiError) {
@@ -359,6 +360,12 @@ export function DashboardPage() {
 					)}
 				</section>
 			</div>
+
+			<AnalysisDetailsSection
+				results={analysisResults}
+				loading={dataLoading}
+				error={dataError}
+			/>
 		</main>
 	);
 }
