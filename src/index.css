@@ -23,6 +23,40 @@ a {
 	padding: 2rem 1.25rem;
 }
 
+.page-dashboard {
+	max-width: 1200px;
+}
+
+.dashboard-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+@media (min-width: 960px) {
+	.dashboard-grid {
+		grid-template-columns: 1.1fr 1fr;
+		align-items: start;
+	}
+}
+
+.panel {
+	padding: 1rem;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background: #fff;
+}
+
+.subsection-title {
+	margin: 0.5rem 0 0;
+	font-size: 1rem;
+}
+
+.small {
+	font-size: 0.85rem;
+}
+
 .stack {
 	display: flex;
 	flex-direction: column;

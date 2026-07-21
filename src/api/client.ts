@@ -1,9 +1,10 @@
 import { getAccessToken } from "../auth/session";
 import type {
 	AnalysisResult,
+	DoctorOpinion,
 	MagicLinkRequest,
 	MagicLinkResponse,
-	User,
+	Purchase,
 	VerifyMagicLinkRequest,
 	VerifyMagicLinkResponse,
 } from "../types/api";
@@ -88,10 +89,6 @@ export function getHello(): Promise<string> {
 	return apiFetch<string>("/");
 }
 
-export function getUsers(): Promise<User[]> {
-	return apiFetch<User[]>("/users");
-}
-
 export function requestMagicLink(
 	body: MagicLinkRequest,
 ): Promise<MagicLinkResponse> {
@@ -112,4 +109,12 @@ export function verifyMagicLink(
 
 export function getMyAnalysisResults(): Promise<AnalysisResult[]> {
 	return apiFetch<AnalysisResult[]>("/analysis-results");
+}
+
+export function getMyPurchases(): Promise<Purchase[]> {
+	return apiFetch<Purchase[]>("/purchases");
+}
+
+export function getMyDoctorOpinions(): Promise<DoctorOpinion[]> {
+	return apiFetch<DoctorOpinion[]>("/doctor-opinions");
 }
