@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { ApiError, requestMagicLink } from "../api/client";
 import { MedMetrixLogo } from "../components/MedMetrixLogo";
-import type { MagicLinkResponse } from "../types/api";
 
 function getErrorMessage(error: unknown): string {
 	if (error instanceof ApiError) {
@@ -22,7 +21,7 @@ export function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [magicLink, setMagicLink] = useState<MagicLinkResponse | null>(null);
+	const [sentToEmail, setSentToEmail] = useState<string | null>(null);
 
 	const trimmedEmail = email.trim();
 	const canSubmit = isValidEmail(trimmedEmail) && !loading;
@@ -33,11 +32,11 @@ export function LoginPage() {
 
 		setLoading(true);
 		setError(null);
-		setMagicLink(null);
+		setSentToEmail(null);
 
 		try {
 			const result = await requestMagicLink({ email: trimmedEmail });
-			setMagicLink(result);
+			setSentToEmail(result.email || trimmedEmail);
 		} catch (err) {
 			setError(getErrorMessage(err));
 		} finally {
@@ -46,7 +45,7 @@ export function LoginPage() {
 	}
 
 	function handleReset() {
-		setMagicLink(null);
+		setSentToEmail(null);
 		setError(null);
 	}
 
@@ -60,15 +59,18 @@ export function LoginPage() {
 						<MedMetrixLogo className="medmetrix-logo" size="lg" />
 						<p className="login-card__eyebrow">Portal pacjenta</p>
 						<h1 id="login-title" className="login-card__title">
-							Zaloguj się do MedMetrix
+							{sentToEmail
+								? "Sprawdź swoją skrzynkę"
+								: "Zaloguj się do MedMetrix"}
 						</h1>
 						<p className="login-card__subtitle">
-							Wyślemy bezpieczny link logowania na Twój adres
-							e-mail. Nie potrzebujesz hasła.
+							{sentToEmail
+								? "Wysłaliśmy Ci bezpieczny link do logowania."
+								: "Wyślemy bezpieczny link logowania na Twój adres e-mail. Nie potrzebujesz hasła."}
 						</p>
 					</header>
 
-					{!magicLink ? (
+					{!sentToEmail ? (
 						<form className="login-form" onSubmit={handleSubmit} noValidate>
 							<label className="login-field" htmlFor="email">
 								<span>Adres e-mail</span>
@@ -124,66 +126,30 @@ export function LoginPage() {
 							</button>
 						</form>
 					) : (
-						<section className="email-sim" aria-live="polite">
-							<div className="email-sim__banner">
-								<span className="email-sim__badge">
-									Tryb deweloperski
-								</span>
+						<section className="login-success" aria-live="polite">
+							<div className="login-alert login-alert--success">
 								<p>
-									Poniżej symulujemy wiadomość e-mail. W
-									produkcji link trafiłby na skrzynkę — teraz
-									kliknij go poniżej, aby się zalogować.
+									Jeśli konto istnieje, link trafił na adres{" "}
+									<strong>{sentToEmail}</strong>.
+								</p>
+								<p>
+									Otwórz wiadomość od MedMetrix i kliknij link,
+									aby się zalogować. Link jest jednorazowy i może
+									wygasnąć.
 								</p>
 							</div>
 
-							<article className="email-preview">
-								<header className="email-preview__meta">
-									<div className="email-preview__from">
-										<span className="email-preview__avatar">
-											M
-										</span>
-										<div>
-											<strong>MedMetrix</strong>
-											<p>noreply@medmetrix.app</p>
-										</div>
-									</div>
-									<p className="email-preview__to">
-										Do: <strong>{magicLink.email}</strong>
-									</p>
-									<p className="email-preview__subject">
-										Twój link do logowania
-									</p>
-								</header>
+							<p className="login-hint">
+								Nie widzisz maila? Sprawdź folder spam / oferty.
+							</p>
 
-								<div className="email-preview__body">
-									<p>Witaj,</p>
-									<p>
-										Kliknij poniższy przycisk, aby bezpiecznie
-										zalogować się do portalu MedMetrix.
-									</p>
-									<a
-										className="email-preview__cta"
-										href={magicLink.actionLink}
-										rel="noreferrer"
-									>
-										Zaloguj się przez link
-									</a>
-									<p className="email-preview__note">
-										Link jest jednorazowy i może wygasnąć.
-										Jeśli go nie użyjesz, wygeneruj nowy.
-									</p>
-								</div>
-							</article>
-
-							<div className="email-sim__actions">
-								<button
-									type="button"
-									className="login-secondary"
-									onClick={handleReset}
-								>
-									Użyj innego e-maila
-								</button>
-							</div>
+							<button
+								type="button"
+								className="login-secondary"
+								onClick={handleReset}
+							>
+								Użyj innego e-maila
+							</button>
 						</section>
 					)}
 				</section>

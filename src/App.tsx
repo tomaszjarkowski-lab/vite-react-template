@@ -8,7 +8,7 @@ export default function App() {
 		<Routes>
 			<Route path="/" element={<LoginPage />} />
 			<Route path="/dashboard" element={<DashboardPage />} />
-			<Route path="/auth/callback" element={<AuthCallbackPage />} />
+			<Route path="/callback" element={<AuthCallbackPage />} />
 			<Route path="*" element={<Navigate to="/" replace />} />
 		</Routes>
 	);

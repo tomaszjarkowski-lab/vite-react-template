@@ -40,7 +40,7 @@ export function AuthCallbackPage() {
 
 		if (!accessToken) {
 			setStatus(
-				"Brak access_token w URL. Sprawdź redirect URL w Supabase (http://localhost:3000/auth/callback) albo wygeneruj nowy link logowania.",
+				"Brak access_token w URL. Sprawdź redirect URL w Supabase (http://localhost:3000/callback) albo wygeneruj nowy link logowania.",
 			);
 			return;
 		}
@@ -54,7 +54,7 @@ export function AuthCallbackPage() {
 			userId: claims.userId,
 		});
 
-		window.history.replaceState(null, "", "/auth/callback");
+		window.history.replaceState(null, "", "/callback");
 		setStatus("Sesja zapisana — przekierowanie…");
 		navigate("/dashboard", { replace: true });
 	}, [navigate]);
