@@ -18,7 +18,7 @@ import {
 
 type TodayViewProps = {
 	email?: string;
-	results: AnalysisResult[];
+	result: AnalysisResult | null;
 	loading: boolean;
 	error: string | null;
 };
@@ -128,7 +128,7 @@ function AnalysisReportCard({ result }: { result: AnalysisResult }) {
 			)}
 
 			{requiresDoctorOpinion && !isDoctorOpinionSubmitted && (
-				<div className="my-3 flex gap-3 rounded-xl border-2 border-[#30b8b88c] bg-[#ECF9F8] p-3">
+				<div className="my-3 flex gap-3 rounded-xl border-2 border-[#34bbbd8c] bg-[#ECF9F8] p-3">
 					<span className="flex h-6 w-6 min-h-6 min-w-6 items-center justify-center rounded-full bg-white">
 						<Clock className="h-4 w-4 text-mm-teal" />
 					</span>
@@ -344,10 +344,10 @@ function AnalysisReportCard({ result }: { result: AnalysisResult }) {
 	);
 }
 
-export function TodayView({ email, results, loading, error }: TodayViewProps) {
+export function TodayView({ email, result, loading, error }: TodayViewProps) {
 	const name = greetingName(email);
 
-	if (loading && results.length === 0) {
+	if (loading && !result) {
 		return (
 			<div className="mx-auto w-full max-w-3xl space-y-4">
 				<div className="h-8 w-56 animate-pulse rounded-lg bg-slate-200" />
@@ -375,14 +375,12 @@ export function TodayView({ email, results, loading, error }: TodayViewProps) {
 				</p>
 			</header>
 
-			{results.length === 0 ? (
+			{!result ? (
 				<section className="rounded-3xl border border-mm-border bg-white p-8 text-center shadow-sm">
 					<p className="text-mm-ink-soft">Brak wyników analiz</p>
 				</section>
 			) : (
-				results.map((result) => (
-					<AnalysisReportCard key={result.id} result={result} />
-				))
+				<AnalysisReportCard key={result.id} result={result} />
 			)}
 		</div>
 	);

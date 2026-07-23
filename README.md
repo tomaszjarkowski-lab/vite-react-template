@@ -15,7 +15,9 @@ API (`VITE_API_BASE_URL`): http://localhost:3332
 ## Strony
 
 - `/` — login (magic link)
-- `/dashboard` — sesja + wyniki analiz
+- `/dashboard` — Dziś (wynik analizy)
+- `/dashboard/plan` — Mój plan
+- `/dashboard/dokumenty` — Dokumenty
 - `/callback` — callback z tokenami w hashu
 
 ## Deploy na Cloudflare Workers

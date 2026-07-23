@@ -1,5 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { ApiError, requestMagicLink } from "../api/client";
+import { getAccessToken } from "../auth/session";
 import { MedMetrixLogo } from "../components/MedMetrixLogo";
 
 function getErrorMessage(error: unknown): string {
@@ -18,10 +20,19 @@ function isValidEmail(value: string): boolean {
 }
 
 export function LoginPage() {
+	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [sentToEmail, setSentToEmail] = useState<string | null>(null);
+
+	const isLoggedIn = Boolean(getAccessToken());
+
+	useEffect(() => {
+		if (isLoggedIn) {
+			navigate("/dashboard", { replace: true });
+		}
+	}, [isLoggedIn, navigate]);
 
 	const trimmedEmail = email.trim();
 	const canSubmit = isValidEmail(trimmedEmail) && !loading;
@@ -47,6 +58,10 @@ export function LoginPage() {
 	function handleReset() {
 		setSentToEmail(null);
 		setError(null);
+	}
+
+	if (isLoggedIn) {
+		return null;
 	}
 
 	return (

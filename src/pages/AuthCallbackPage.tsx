@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AlertCircle, CheckCircle2, Loader2, MailX } from "lucide-react";
-import { getUserClaimsFromAccessToken } from "../auth/jwt";
 import { saveSession } from "../auth/session";
 import { MedMetrixLogo } from "../components/MedMetrixLogo";
 
@@ -107,13 +106,9 @@ export function AuthCallbackPage() {
 			return;
 		}
 
-		const claims = getUserClaimsFromAccessToken(accessToken);
-
 		saveSession({
 			accessToken,
 			refreshToken,
-			email: claims.email,
-			userId: claims.userId,
 		});
 
 		window.history.replaceState(null, "", "/callback");

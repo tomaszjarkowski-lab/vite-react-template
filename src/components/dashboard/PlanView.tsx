@@ -113,7 +113,7 @@ export function PlanView({
 			)}
 
 			{pendingOpinion && !readyOpinion && (
-				<section className="flex gap-3 rounded-xl border-2 border-[#30b8b88c] bg-[#ECF9F8] p-4">
+				<section className="flex gap-3 rounded-xl border-2 border-[#34bbbd8c] bg-[#ECF9F8] p-4">
 					<span className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
 						<Clock className="h-4 w-4 text-mm-teal" />
 					</span>

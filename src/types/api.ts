@@ -54,8 +54,6 @@ export type VerifyMagicLinkResponse = {
 export type Session = {
 	accessToken: string;
 	refreshToken?: string;
-	email?: string;
-	userId?: string;
 };
 
 export type Purchase = {
